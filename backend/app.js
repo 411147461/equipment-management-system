@@ -7,9 +7,29 @@ const app = express();
 // 設定埠號
 const PORT = 3000;
 
-// 建立首頁 API
+// 首頁
 app.get("/", (req, res) => {
+
+    console.log(req.headers);
+
     res.send("Equipment Management System API");
+
+});
+
+// 設備列表
+app.get("/equipment", (req, res) => {
+    res.send("Equipment List");
+});
+
+// 關於我們
+app.get("/about", (req, res) => {
+
+    console.log(req.method);
+
+    console.log(req.url);
+
+    res.send("About Equipment Management System");
+
 });
 
 // 啟動伺服器
