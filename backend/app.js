@@ -1,3 +1,5 @@
+const equipmentRoutes = require("./routes/equipment");
+
 // 載入 Express
 const express = require("express");
 
@@ -7,6 +9,7 @@ const app = express();
 // 設定埠號
 const PORT = 3000;
 
+app.use("/equipment", equipmentRoutes);
 // 首頁
 app.get("/", (req, res) => {
 
@@ -16,10 +19,6 @@ app.get("/", (req, res) => {
 
 });
 
-// 設備列表
-app.get("/equipment", (req, res) => {
-    res.send("Equipment List");
-});
 
 // 關於我們
 app.get("/about", (req, res) => {
