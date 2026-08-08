@@ -133,9 +133,45 @@ const updateEquipment = async (req, res) => {
         });
     }
 };
+// 刪除指定 ID 的設備
+const deleteEquipment = async (req, res) => {
+
+    try {
+
+        // 從網址取得設備 ID
+        // 例如 /equipment/4 → id 就是 "4"
+        const { id } = req.params;
+
+        // 呼叫 Model 刪除設備
+        const affectedRows = await equipmentModel.deleteEquipment(id);
+
+        // 如果沒有刪除任何資料，代表找不到這個設備
+        if (affectedRows === 0) {
+            return res.status(404).json({
+                message: "找不到此設備"
+            });
+        }
+
+        // 刪除成功
+        res.json({
+            message: "設備刪除成功"
+        });
+
+    } catch (error) {
+
+        // 將錯誤印在 Server Console
+        console.error(error);
+
+        // 回傳伺服器錯誤
+        res.status(500).json({
+            message: "刪除設備失敗"
+        });
+    }
+};
 module.exports = {
     getAllEquipment,
     getEquipmentById,
     createEquipment,
-    updateEquipment
+    updateEquipment,
+    deleteEquipment
 };

@@ -57,9 +57,22 @@ const updateEquipment = async (id, equipment) => {
     // 回傳實際被修改的資料筆數
     return result.affectedRows;
 };
+// 刪除指定 ID 的設備
+const deleteEquipment = async (id) => {
+
+    // 根據設備 ID 刪除資料
+    const [result] = await db.query(
+        "DELETE FROM equipment WHERE id = ?",
+        [id]
+    );
+
+    // 回傳實際被刪除的資料筆數
+    return result.affectedRows;
+};
 module.exports = {
     getAllEquipment,
     getEquipmentById,
     createEquipment,
-    updateEquipment
+    updateEquipment,
+    deleteEquipment
 };

@@ -19,4 +19,8 @@ router.post("/", equipmentController.createEquipment);
 // 修改指定設備
 router.put("/:id", equipmentController.updateEquipment);
 
+// DELETE /equipment/:id
+// 刪除指定設備
+router.delete("/:id", equipmentController.deleteEquipment);
+
 module.exports = router;
