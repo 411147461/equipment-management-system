@@ -1,0 +1,63 @@
+/* 整個網頁的基本設定 */
+body {
+    margin: 0;
+    padding: 0;
+
+    font-family: Arial, sans-serif;
+
+    background-color: #f5f6f8;
+    color: #333;
+}
+
+/* 主要內容區域 */
+.container {
+    width: 90%;
+    max-width: 1000px;
+
+    margin: 50px auto;
+}
+
+/* 網頁標題 */
+h1 {
+    margin-bottom: 5px;
+}
+
+/* 副標題 */
+.subtitle {
+    color: #777;
+    margin-bottom: 30px;
+}
+
+/* 設備列表 */
+#equipmentList {
+    display: grid;
+
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(250px, 1fr)
+    );
+
+    gap: 20px;
+}
+
+/* 單一設備卡片 */
+.equipment-card {
+    background-color: white;
+
+    padding: 20px;
+
+    border-radius: 10px;
+
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* 設備名稱 */
+.equipment-card h3 {
+    margin-top: 0;
+}
+
+/* 設備資訊 */
+.equipment-card p {
+    margin: 8px 0;
+}

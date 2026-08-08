@@ -3,10 +3,18 @@ const equipmentRoutes = require("./routes/equipment");
 // 載入 Express
 const express = require("express");
 
+// 載入 CORS Middleware
+// 允許前端網頁向後端 API 發送 Request
+const cors = require("cors");
+
 // 建立 Express 應用程式
 const app = express();
 
 app.use(express.json());
+
+// 啟用 CORS
+// 讓不同來源的前端可以存取 API
+app.use(cors());
 
 // 設定埠號
 const PORT = 3000;
