@@ -47,37 +47,14 @@ const createEquipment = async (req, res) => {
 
     try {
 
-        // 從 Request Body 取得設備資料
+        // Middleware 已經完成資料驗證
+        // 這裡直接取得 Request Body
         const {
             name,
             category,
             status,
             description
         } = req.body;
-
-        // 檢查設備名稱是否存在
-        if (!name || name.trim() === "") {
-            return res.status(400).json({
-                message: "設備名稱為必填"
-            });
-        }
-
-        // 檢查設備分類是否存在
-        if (!category || category.trim() === "") {
-            return res.status(400).json({
-                message: "設備分類為必填"
-            });
-        }
-
-        // 定義設備允許使用的狀態
-        const allowedStatus = ["available", "borrowed"];
-
-        // 檢查 status 是否為合法值
-        if (!allowedStatus.includes(status)) {
-            return res.status(400).json({
-                message: "設備狀態只能是 available 或 borrowed"
-            });
-        }
 
         // 將資料交給 Model 寫入資料庫
         const equipmentId = await equipmentModel.createEquipment({
@@ -110,40 +87,17 @@ const updateEquipment = async (req, res) => {
     try {
 
         // 從網址取得設備 ID
-        // 例如 /equipment/4 → id 就是 "4"
+        // 例如 /equipment/2 → id 就是 "2"
         const { id } = req.params;
 
-        // 從 Request Body 取得要修改的資料
+        // Middleware 已經完成資料驗證
+        // 這裡直接取得 Request Body
         const {
             name,
             category,
             status,
             description
         } = req.body;
-
-        // 檢查設備名稱是否存在
-        if (!name || name.trim() === "") {
-            return res.status(400).json({
-                message: "設備名稱為必填"
-            });
-        }
-
-        // 檢查設備分類是否存在
-        if (!category || category.trim() === "") {
-            return res.status(400).json({
-                message: "設備分類為必填"
-            });
-        }
-
-        // 定義設備允許使用的狀態
-        const allowedStatus = ["available", "borrowed"];
-
-        // 檢查 status 是否為合法值
-        if (!allowedStatus.includes(status)) {
-            return res.status(400).json({
-                message: "設備狀態只能是 available 或 borrowed"
-            });
-        }
 
         // 將資料交給 Model 修改資料庫
         const affectedRows = await equipmentModel.updateEquipment(
