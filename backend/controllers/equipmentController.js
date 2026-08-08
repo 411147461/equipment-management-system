@@ -1,19 +1,21 @@
-const getAllEquipment = (req, res) => {
+const equipmentModel = require("../models/equipmentModel");
 
-    const equipments = [
-        {
-            id: 1,
-            name: "Arduino UNO",
-            status: "可借用"
-        },
-        {
-            id: 2,
-            name: "Raspberry Pi 5",
-            status: "借出中"
-        }
-    ];
+const getAllEquipment = async (req, res) => {
 
-    res.json(equipments);
+    try {
+
+        const equipments = await equipmentModel.getAllEquipment();
+
+        res.json(equipments);
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            message: "取得設備資料失敗"
+        });
+    }
 };
 
 module.exports = {
