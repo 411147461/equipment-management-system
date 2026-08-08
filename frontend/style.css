@@ -61,3 +61,187 @@ h1 {
 .equipment-card p {
     margin: 8px 0;
 }
+/* ========================= */
+/* 新增設備表單 */
+/* ========================= */
+
+/* 表單區域 */
+.form-section {
+    background-color: white;
+
+    padding: 25px;
+
+    margin-bottom: 40px;
+
+    border-radius: 10px;
+
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+
+/* 每一個表單欄位 */
+.form-group {
+    margin-bottom: 20px;
+}
+
+
+/* 欄位標題 */
+.form-group label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-weight: bold;
+}
+
+
+/* 文字輸入框與下拉選單 */
+.form-group input,
+.form-group select,
+.form-group textarea {
+
+    width: 100%;
+
+    padding: 10px;
+
+    box-sizing: border-box;
+
+    border: 1px solid #ccc;
+
+    border-radius: 6px;
+
+    font-size: 16px;
+}
+
+
+/* 描述輸入框 */
+.form-group textarea {
+
+    min-height: 100px;
+
+    resize: vertical;
+}
+
+
+/* 新增按鈕 */
+.submit-button {
+
+    padding: 10px 20px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    background-color: #333;
+
+    color: white;
+
+    font-size: 16px;
+
+    cursor: pointer;
+}
+
+
+/* 滑鼠移到按鈕上 */
+.submit-button:hover {
+    opacity: 0.8;
+}
+/* ========================= */
+/* 設備操作按鈕 */
+/* ========================= */
+
+.equipment-actions {
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 20px;
+}
+
+
+/* 修改按鈕 */
+.edit-button {
+
+    padding: 8px 16px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+}
+
+
+/* 刪除按鈕 */
+.delete-button {
+
+    padding: 8px 16px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+}
+/* ========================= */
+/* 取消修改按鈕 */
+/* ========================= */
+
+.cancel-button {
+
+    padding: 10px 20px;
+
+    margin-left: 10px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 6px;
+
+    background-color: white;
+
+    color: #333;
+
+    font-size: 16px;
+
+    cursor: pointer;
+}
+
+
+/* 滑鼠移到取消按鈕 */
+.cancel-button:hover {
+
+    background-color: #f0f0f0;
+
+}
+/* ========================= */
+/* 設備狀態 */
+/* ========================= */
+
+.status {
+    display: inline-block;
+
+    padding: 4px 10px;
+
+    border-radius: 20px;
+
+    font-size: 14px;
+
+    font-weight: bold;
+}
+
+
+/* 可借用 */
+.status.available {
+    background-color: #d4edda;
+
+    color: #155724;
+}
+
+
+/* 借出中 */
+.status.borrowed {
+    background-color: #f8d7da;
+
+    color: #721c24;
+}

@@ -25,12 +25,242 @@
             Equipment Management System
         </p>
 
+
+        <!-- ========================= -->
+        <!-- 新增設備區域 -->
+        <!-- ========================= -->
+
+        <section class="form-section">
+
+            <h2>新增設備</h2>
+
+            <!--
+                設備新增表單
+                使用者填寫資料後，
+                JavaScript 會將資料送到後端 API
+            -->
+            <form id="equipmentForm">
+
+                <!-- 設備名稱 -->
+                <div class="form-group">
+
+                    <label for="name">
+                        設備名稱
+                    </label>
+
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        placeholder="例如：Arduino UNO"
+                    >
+
+                </div>
+
+
+                <!-- 設備分類 -->
+                <div class="form-group">
+
+                    <label for="category">
+                        設備分類
+                    </label>
+
+                    <input
+                        type="text"
+                        id="category"
+                        name="category"
+                        placeholder="例如：Development Board"
+                    >
+
+                </div>
+
+
+                <!-- 設備狀態 -->
+                <div class="form-group">
+
+                    <label for="status">
+                        設備狀態
+                    </label>
+
+                    <select
+                        id="status"
+                        name="status"
+                    >
+
+                        <!--
+                            value 必須和後端定義的 status 一樣
+                        -->
+                        <option value="available">
+                            可借用
+                        </option>
+
+                        <option value="borrowed">
+                            借出中
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- 設備描述 -->
+                <div class="form-group">
+
+                    <label for="description">
+                        設備描述
+                    </label>
+
+                    <textarea
+                        id="description"
+                        name="description"
+                        placeholder="輸入設備相關描述"
+                    ></textarea>
+
+                </div>
+
+
+                <!-- 送出按鈕 -->
+                <button
+                    type="submit"
+                    class="submit-button"
+                >
+                    新增設備
+                </button>
+
+            </form>
+
+        </section>
+
+        <!-- ========================= -->
+        <!-- 修改設備區域 -->
+        <!-- ========================= -->
+
+        <section
+            class="form-section"
+            id="editSection"
+            style="display: none;"
+        >
+
+            <h2>修改設備</h2>
+
+            <!--
+                修改設備表單
+                使用者按下「修改」後，
+                JavaScript 會將目前設備資料放入這裡
+            -->
+            <form id="editEquipmentForm">
+
+                <!-- 儲存目前正在修改的設備 ID -->
+                <input
+                    type="hidden"
+                    id="editId"
+                >
+
+
+                <!-- 設備名稱 -->
+                <div class="form-group">
+
+                    <label for="editName">
+                        設備名稱
+                    </label>
+
+                    <input
+                        type="text"
+                        id="editName"
+                        name="editName"
+                    >
+
+                </div>
+
+
+                <!-- 設備分類 -->
+                <div class="form-group">
+
+                    <label for="editCategory">
+                        設備分類
+                    </label>
+
+                    <input
+                        type="text"
+                        id="editCategory"
+                        name="editCategory"
+                    >
+
+                </div>
+
+
+                <!-- 設備狀態 -->
+                <div class="form-group">
+
+                    <label for="editStatus">
+                        設備狀態
+                    </label>
+
+                    <select
+                        id="editStatus"
+                        name="editStatus"
+                    >
+
+                        <option value="available">
+                            可借用
+                        </option>
+
+                        <option value="borrowed">
+                            借出中
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- 設備描述 -->
+                <div class="form-group">
+
+                    <label for="editDescription">
+                        設備描述
+                    </label>
+
+                    <textarea
+                        id="editDescription"
+                        name="editDescription"
+                    ></textarea>
+
+                </div>
+
+
+                <!-- 操作按鈕 -->
+                <button
+                    type="submit"
+                    class="submit-button"
+                >
+                    儲存修改
+                </button>
+
+                <button
+                    type="button"
+                    class="cancel-button"
+                    id="cancelEditButton"
+                >
+                    取消
+                </button>
+
+            </form>
+
+        </section>
+        
+        <!-- ========================= -->
         <!-- 設備列表區域 -->
+        <!-- ========================= -->
+
         <section>
 
             <h2>設備列表</h2>
 
-            <!-- JavaScript 會將設備資料放到這裡 -->
+            <!--
+                JavaScript 會將從 API 取得的設備
+                顯示在這個區域
+            -->
             <div id="equipmentList">
                 載入中...
             </div>
@@ -38,6 +268,7 @@
         </section>
 
     </main>
+
 
     <!-- 載入 JavaScript -->
     <script src="app.js"></script>
