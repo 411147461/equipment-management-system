@@ -32,8 +32,34 @@ const createEquipment = async (equipment) => {
 
     return result.insertId;
 };
+// 修改指定 ID 的設備資料
+const updateEquipment = async (id, equipment) => {
+
+    // 從傳入的設備物件中取出需要修改的欄位
+    const {
+        name,
+        category,
+        status,
+        description
+    } = equipment;
+
+    // 使用 ? 參數傳遞資料，避免直接拼接使用者輸入
+    const [result] = await db.query(
+        `UPDATE equipment
+         SET name = ?,
+             category = ?,
+             status = ?,
+             description = ?
+         WHERE id = ?`,
+        [name, category, status, description, id]
+    );
+
+    // 回傳實際被修改的資料筆數
+    return result.affectedRows;
+};
 module.exports = {
     getAllEquipment,
     getEquipmentById,
-    createEquipment
+    createEquipment,
+    updateEquipment
 };

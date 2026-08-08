@@ -75,8 +75,67 @@ const createEquipment = async (req, res) => {
         });
     }
 };
+// 修改指定 ID 的設備
+const updateEquipment = async (req, res) => {
+
+    try {
+
+        // 從網址取得設備 ID
+        // 例如 /equipment/4 → req.params.id 就是 "4"
+        const { id } = req.params;
+
+        // 從 Request Body 取得要修改的資料
+        const {
+            name,
+            category,
+            status,
+            description
+        } = req.body;
+
+        // 設備名稱是必要欄位
+        if (!name) {
+            return res.status(400).json({
+                message: "設備名稱為必填"
+            });
+        }
+
+        // 呼叫 Model 修改資料
+        const affectedRows = await equipmentModel.updateEquipment(
+            id,
+            {
+                name,
+                category,
+                status,
+                description
+            }
+        );
+
+        // 如果沒有任何資料被修改，代表找不到這個 ID
+        if (affectedRows === 0) {
+            return res.status(404).json({
+                message: "找不到此設備"
+            });
+        }
+
+        // 修改成功
+        res.json({
+            message: "設備修改成功"
+        });
+
+    } catch (error) {
+
+        // 將錯誤印在 Server Console，方便除錯
+        console.error(error);
+
+        // 回傳伺服器錯誤
+        res.status(500).json({
+            message: "修改設備失敗"
+        });
+    }
+};
 module.exports = {
     getAllEquipment,
     getEquipmentById,
-    createEquipment
+    createEquipment,
+    updateEquipment
 };
