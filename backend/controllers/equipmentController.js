@@ -42,25 +42,52 @@ const getEquipmentById = async (req, res) => {
         });
     }
 };
+// 新增設備
 const createEquipment = async (req, res) => {
 
     try {
 
-        const { name, category, status, description } = req.body;
+        // 從 Request Body 取得設備資料
+        const {
+            name,
+            category,
+            status,
+            description
+        } = req.body;
 
-        if (!name) {
+        // 檢查設備名稱是否存在
+        if (!name || name.trim() === "") {
             return res.status(400).json({
                 message: "設備名稱為必填"
             });
         }
 
+        // 檢查設備分類是否存在
+        if (!category || category.trim() === "") {
+            return res.status(400).json({
+                message: "設備分類為必填"
+            });
+        }
+
+        // 定義設備允許使用的狀態
+        const allowedStatus = ["available", "borrowed"];
+
+        // 檢查 status 是否為合法值
+        if (!allowedStatus.includes(status)) {
+            return res.status(400).json({
+                message: "設備狀態只能是 available 或 borrowed"
+            });
+        }
+
+        // 將資料交給 Model 寫入資料庫
         const equipmentId = await equipmentModel.createEquipment({
-            name,
-            category,
+            name: name.trim(),
+            category: category.trim(),
             status,
-            description
+            description: description || ""
         });
 
+        // 新增成功，HTTP 201 表示 Created
         res.status(201).json({
             message: "設備新增成功",
             id: equipmentId
@@ -68,8 +95,10 @@ const createEquipment = async (req, res) => {
 
     } catch (error) {
 
+        // 將錯誤輸出到 Server Console
         console.error(error);
 
+        // 回傳伺服器錯誤
         res.status(500).json({
             message: "新增設備失敗"
         });
@@ -81,7 +110,7 @@ const updateEquipment = async (req, res) => {
     try {
 
         // 從網址取得設備 ID
-        // 例如 /equipment/4 → req.params.id 就是 "4"
+        // 例如 /equipment/4 → id 就是 "4"
         const { id } = req.params;
 
         // 從 Request Body 取得要修改的資料
@@ -92,25 +121,42 @@ const updateEquipment = async (req, res) => {
             description
         } = req.body;
 
-        // 設備名稱是必要欄位
-        if (!name) {
+        // 檢查設備名稱是否存在
+        if (!name || name.trim() === "") {
             return res.status(400).json({
                 message: "設備名稱為必填"
             });
         }
 
-        // 呼叫 Model 修改資料
+        // 檢查設備分類是否存在
+        if (!category || category.trim() === "") {
+            return res.status(400).json({
+                message: "設備分類為必填"
+            });
+        }
+
+        // 定義設備允許使用的狀態
+        const allowedStatus = ["available", "borrowed"];
+
+        // 檢查 status 是否為合法值
+        if (!allowedStatus.includes(status)) {
+            return res.status(400).json({
+                message: "設備狀態只能是 available 或 borrowed"
+            });
+        }
+
+        // 將資料交給 Model 修改資料庫
         const affectedRows = await equipmentModel.updateEquipment(
             id,
             {
-                name,
-                category,
+                name: name.trim(),
+                category: category.trim(),
                 status,
-                description
+                description: description || ""
             }
         );
 
-        // 如果沒有任何資料被修改，代表找不到這個 ID
+        // 如果沒有修改任何資料，代表找不到這個 ID
         if (affectedRows === 0) {
             return res.status(404).json({
                 message: "找不到此設備"
@@ -124,7 +170,7 @@ const updateEquipment = async (req, res) => {
 
     } catch (error) {
 
-        // 將錯誤印在 Server Console，方便除錯
+        // 將錯誤輸出到 Server Console
         console.error(error);
 
         // 回傳伺服器錯誤
