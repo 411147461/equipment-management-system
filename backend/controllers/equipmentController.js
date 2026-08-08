@@ -42,7 +42,41 @@ const getEquipmentById = async (req, res) => {
         });
     }
 };
+const createEquipment = async (req, res) => {
+
+    try {
+
+        const { name, category, status, description } = req.body;
+
+        if (!name) {
+            return res.status(400).json({
+                message: "設備名稱為必填"
+            });
+        }
+
+        const equipmentId = await equipmentModel.createEquipment({
+            name,
+            category,
+            status,
+            description
+        });
+
+        res.status(201).json({
+            message: "設備新增成功",
+            id: equipmentId
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            message: "新增設備失敗"
+        });
+    }
+};
 module.exports = {
     getAllEquipment,
-    getEquipmentById
+    getEquipmentById,
+    createEquipment
 };

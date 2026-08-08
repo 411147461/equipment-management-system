@@ -15,8 +15,25 @@ const getEquipmentById = async (id) => {
 
     return rows[0];
 };
+const createEquipment = async (equipment) => {
+    const {
+        name,
+        category,
+        status,
+        description
+    } = equipment;
 
+    const [result] = await db.query(
+        `INSERT INTO equipment
+        (name, category, status, description)
+        VALUES (?, ?, ?, ?)`,
+        [name, category, status, description]
+    );
+
+    return result.insertId;
+};
 module.exports = {
     getAllEquipment,
-    getEquipmentById
+    getEquipmentById,
+    createEquipment
 };

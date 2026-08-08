@@ -6,6 +6,8 @@ const express = require("express");
 // 建立 Express 應用程式
 const app = express();
 
+app.use(express.json());
+
 // 設定埠號
 const PORT = 3000;
 

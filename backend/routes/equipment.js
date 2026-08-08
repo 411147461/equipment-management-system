@@ -7,4 +7,6 @@ router.get("/", equipmentController.getAllEquipment);
 
 router.get("/:id", equipmentController.getEquipmentById);
 
+router.post("/", equipmentController.createEquipment);
+
 module.exports = router;
