@@ -6,6 +6,17 @@ const getAllEquipment = async () => {
     return rows;
 };
 
+
+const getEquipmentById = async (id) => {
+    const [rows] = await db.query(
+        "SELECT * FROM equipment WHERE id = ?",
+        [id]
+    );
+
+    return rows[0];
+};
+
 module.exports = {
-    getAllEquipment
+    getAllEquipment,
+    getEquipmentById
 };
