@@ -1,5 +1,11 @@
 const equipmentRoutes = require("./routes/equipment");
 
+// 載入借用相關 API
+const borrowRoutes = require("./routes/borrow");
+
+// 載入使用者相關 API
+const userRoutes = require("./routes/user");
+
 // 載入 Express
 const express = require("express");
 
@@ -20,6 +26,14 @@ app.use(cors());
 const PORT = 3000;
 
 app.use("/equipment", equipmentRoutes);
+
+// 借用 / 歸還相關 API
+app.use("/borrow", borrowRoutes);
+
+// 使用者 API
+// 例如：POST /users/register
+app.use("/users", userRoutes);
+
 // 首頁
 app.get("/", (req, res) => {
 

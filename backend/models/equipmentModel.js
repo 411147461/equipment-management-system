@@ -69,10 +69,39 @@ const deleteEquipment = async (id) => {
     // 回傳實際被刪除的資料筆數
     return result.affectedRows;
 };
+// =========================
+// 更新設備狀態
+// =========================
+
+async function updateEquipmentStatus(
+    equipmentId,
+    status
+) {
+
+    // 更新指定設備的狀態
+    const sql = `
+        UPDATE equipment
+        SET status = ?
+        WHERE id = ?
+    `;
+
+    // 執行 SQL
+    const [result] = await db.execute(
+        sql,
+        [
+            status,
+            equipmentId
+        ]
+    );
+
+    // 回傳受影響的資料筆數
+    return result.affectedRows;
+}
 module.exports = {
     getAllEquipment,
     getEquipmentById,
     createEquipment,
     updateEquipment,
-    deleteEquipment
+    deleteEquipment,
+    updateEquipmentStatus
 };
