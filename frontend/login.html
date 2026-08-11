@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+
+    <!-- 網頁編碼 -->
+    <meta charset="UTF-8">
+
+    <!-- RWD 設定 -->
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <!-- 網頁標題 -->
+    <title>登入 | 設備管理系統</title>
+
+    <!-- 載入共用 CSS -->
+    <link rel="stylesheet"
+          href="./style.css">
+
+</head>
+
+
+<body class="auth-page">
+
+    <!-- =========================
+         登入頁面
+         ========================= -->
+
+    <main class="auth-container">
+
+        <!-- 系統名稱 -->
+
+        <div class="auth-header">
+
+            <div class="logo">
+                EMS
+            </div>
+
+            <h1>設備管理系統</h1>
+
+            <p>
+                Equipment Management System
+            </p>
+
+        </div>
+
+
+        <!-- 登入卡片 -->
+
+        <div class="auth-card">
+
+            <h2>歡迎回來</h2>
+
+            <p class="auth-description">
+                請登入您的帳號
+            </p>
+
+
+            <!-- =========================
+                 登入表單
+                 ========================= -->
+
+            <form id="loginForm">
+
+
+                <!-- 使用者名稱 -->
+
+                <div class="form-group">
+
+                    <label for="username">
+                        使用者名稱
+                    </label>
+
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="請輸入使用者名稱"
+                        autocomplete="username"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- 密碼 -->
+
+                <div class="form-group">
+
+                    <label for="password">
+                        密碼
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="請輸入密碼"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- 登入按鈕 -->
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    登入
+                </button>
+
+
+                <!-- 登入結果 -->
+
+                <p
+                    id="message"
+                    class="form-message"
+                ></p>
+
+            </form>
+
+
+            <!-- 註冊 -->
+
+            <div class="auth-footer">
+
+                <span>
+                    還沒有帳號？
+                </span>
+
+                <a href="./register.html">
+                    立即註冊
+                </a>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- 登入 JavaScript -->
+
+    <script src="./js/login.js"></script>
+
+</body>
+
+</html>

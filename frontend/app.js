@@ -1,87 +1,338 @@
-// =========================
+// ========================================
 // API 設定
-// =========================
+// ========================================
 
-// 後端設備 API 的網址
+// 後端設備 API 網址
 const API_URL = "http://localhost:3000/equipment";
 
+// 後端 API 基礎網址
+const BASE_URL = "http://localhost:3000";
 
-// =========================
+
+// ========================================
+// 登入狀態
+// ========================================
+
+// 從 Local Storage 取得 JWT Token
+const token = localStorage.getItem("token");
+
+// 取得登入使用者名稱
+const username = localStorage.getItem("username");
+
+// 取得使用者姓名
+const name = localStorage.getItem("name");
+
+// 取得使用者角色
+const role = localStorage.getItem("role");
+
+
+// ========================================
+// 檢查是否登入
+// ========================================
+
+// 如果沒有 Token
+// 代表使用者尚未登入
+if (!token) {
+
+    // 導向登入頁面
+    window.location.href = "./login.html";
+}
+
+
+// ========================================
+// 顯示使用者資訊
+// ========================================
+
+// 顯示使用者名稱
+const userNameElement =
+    document.getElementById("userName");
+
+if (userNameElement) {
+
+    // 優先顯示姓名
+    userNameElement.textContent =
+        name || username || "使用者";
+}
+
+
+// 顯示歡迎名稱
+const welcomeNameElement =
+    document.getElementById("welcomeName");
+
+if (welcomeNameElement) {
+
+    welcomeNameElement.textContent =
+        name || username || "使用者";
+}
+
+
+// 顯示使用者角色
+const userRoleElement =
+    document.getElementById("userRole");
+
+if (userRoleElement) {
+
+    userRoleElement.textContent =
+        role === "admin"
+            ? "管理員"
+            : "一般使用者";
+}
+
+
+// ========================================
+// 管理員權限控制
+// ========================================
+
+// 取得所有只允許管理員使用的區域
+const adminElements =
+    document.querySelectorAll(".admin-only");
+
+
+// 如果不是管理員
+if (role !== "admin") {
+
+    // 將管理員功能全部隱藏
+    adminElements.forEach(element => {
+
+        element.style.display = "none";
+
+    });
+
+}
+
+
+// ========================================
+// 登出功能
+// ========================================
+
+const logoutButton =
+    document.getElementById("logoutButton");
+
+
+if (logoutButton) {
+
+    logoutButton.addEventListener(
+        "click",
+        function () {
+
+            // 清除登入資訊
+            localStorage.removeItem("token");
+
+            localStorage.removeItem("username");
+
+            localStorage.removeItem("name");
+
+            localStorage.removeItem("role");
+
+
+            // 回到登入頁面
+            window.location.href =
+                "./login.html";
+
+        }
+    );
+
+}
+
+
+// ========================================
+// 建立 JWT Request Headers
+// ========================================
+
+// 所有需要登入的 API
+// 都可以使用這個 Header
+function getAuthHeaders() {
+
+    return {
+
+        // 告訴後端傳送 JSON
+        "Content-Type": "application/json",
+
+        // 將 JWT 放進 Authorization Header
+        Authorization: `Bearer ${token}`
+
+    };
+
+}
+
+
+// ========================================
 // 取得設備列表
-// =========================
+// ========================================
 
 async function loadEquipment() {
 
     try {
 
-        // 向後端 API 發送 GET Request
-        const response = await fetch(API_URL);
+        // 向後端取得設備資料
+        const response =
+            await fetch(API_URL);
 
-        // 將後端回傳的 JSON 轉成 JavaScript 資料
-        const equipmentList = await response.json();
 
-        // 找到 HTML 中的設備列表區域
-        const container = document.getElementById("equipmentList");
+        // 如果 Token 過期
+        // Backend 可能會回傳 401
+        if (response.status === 401) {
 
-        // 清除原本的「載入中...」
+            logout();
+
+            return;
+        }
+
+
+        // 將 JSON 轉成 JavaScript 資料
+        const equipmentList =
+            await response.json();
+
+
+        // 找到設備列表區域
+        const container =
+            document.getElementById(
+                "equipmentList"
+            );
+
+
+        // 清空原本內容
         container.innerHTML = "";
 
 
-        // 將每一筆設備資料顯示在畫面上
+        // ========================================
+        // 更新統計數字
+        // ========================================
+
+        updateStatistics(equipmentList);
+
+
+        // 如果沒有設備
+        if (equipmentList.length === 0) {
+
+            container.innerHTML = `
+                <div class="loading">
+                    目前沒有設備資料
+                </div>
+            `;
+
+            return;
+        }
+
+
+        // ========================================
+        // 建立設備卡片
+        // ========================================
+
         equipmentList.forEach(equipment => {
 
-            // 建立一個新的 div
-            const card = document.createElement("div");
-
-            // 設定設備卡片的 CSS class
-            card.className = "equipment-card";
+            // 建立設備卡片
+            const card =
+                document.createElement("div");
 
 
-            // 將設備資料放入卡片
+            // 設定 CSS class
+            card.className =
+                "equipment-card";
+
+
+            // 判斷設備狀態
+            const isAvailable =
+                equipment.status === "available";
+
+
+            // 建立設備卡片 HTML
             card.innerHTML = `
-                <h3>${equipment.name}</h3>
+
+                <h3>
+                    ${equipment.name}
+                </h3>
+
 
                 <p>
                     <strong>分類：</strong>
                     ${equipment.category}
                 </p>
-                <strong>狀態：</strong>
-                <span class="status ${equipment.status}">
-                    ${
-                        equipment.status === "available"
-                            ? "可借用"
-                            : "借出中"
-                    }
-                </span>
+
+
+                <p>
+
+                    <strong>狀態：</strong>
+
+                    <span class="status ${equipment.status}">
+
+                        ${
+                            isAvailable
+                                ? "可借用"
+                                : "借出中"
+                        }
+
+                    </span>
+
+                </p>
+
 
                 <p>
                     <strong>描述：</strong>
                     ${equipment.description || "無"}
                 </p>
 
-                <!-- 設備操作按鈕 -->
+
                 <div class="equipment-actions">
 
-                    <!-- 修改設備 -->
-                    <button
-                        class="edit-button"
-                        onclick="editEquipment(${equipment.id})"
-                    >
-                        修改
-                    </button>
+                    ${
+                        role === "admin"
 
-                    <!-- 刪除設備 -->
-                    <button
-                        class="delete-button"
-                        onclick="deleteEquipment(${equipment.id})"
-                    >
-                        刪除
-                    </button>
+                            ? `
+
+                                <button
+                                    class="edit-button"
+                                    onclick="editEquipment(${equipment.id})"
+                                >
+                                    修改
+                                </button>
+
+                                <button
+                                    class="delete-button"
+                                    onclick="deleteEquipment(${equipment.id})"
+                                >
+                                    刪除
+                                </button>
+
+                              `
+
+                            : `
+
+                                ${
+                                    isAvailable
+
+                                        ? `
+
+                                            <button
+                                                class="borrow-button"
+                                                onclick="borrowEquipment(${equipment.id})"
+                                            >
+                                                借用設備
+                                            </button>
+
+                                          `
+
+                                        : `
+
+                                            <button
+                                                class="borrow-button disabled"
+                                                disabled
+                                            >
+                                                借出中
+                                            </button>
+
+                                          `
+                                }
+
+                              `
+                    }
 
                 </div>
+
             `;
 
-            // 將卡片加入設備列表
+
+            // 將設備卡片加入列表
             container.appendChild(card);
 
         });
@@ -89,41 +340,148 @@ async function loadEquipment() {
 
     } catch (error) {
 
-        // 如果 API 連線失敗
-        console.error("載入設備失敗：", error);
+        // 顯示錯誤
+        console.error(
+            "載入設備失敗：",
+            error
+        );
+
 
         // 顯示錯誤訊息
-        document.getElementById("equipmentList").innerHTML =
-            "<p>無法載入設備資料</p>";
+        document.getElementById(
+            "equipmentList"
+        ).innerHTML = `
+
+            <div class="loading">
+
+                無法載入設備資料
+
+            </div>
+
+        `;
+
     }
+
 }
 
 
+// ========================================
+// 更新設備統計
+// ========================================
 
-// =========================
+function updateStatistics(equipmentList) {
+
+    // 計算設備總數
+    const total =
+        equipmentList.length;
+
+
+    // 計算可借用數量
+    const available =
+        equipmentList.filter(
+            equipment =>
+                equipment.status === "available"
+        ).length;
+
+
+    // 計算借出中數量
+    const borrowed =
+        equipmentList.filter(
+            equipment =>
+                equipment.status === "borrowed"
+        ).length;
+
+
+    // 更新畫面上的數字
+    const totalElement =
+        document.getElementById(
+            "totalEquipment"
+        );
+
+    const availableElement =
+        document.getElementById(
+            "availableEquipment"
+        );
+
+    const borrowedElement =
+        document.getElementById(
+            "borrowedEquipment"
+        );
+
+
+    if (totalElement) {
+
+        totalElement.textContent =
+            total;
+
+    }
+
+
+    if (availableElement) {
+
+        availableElement.textContent =
+            available;
+
+    }
+
+
+    if (borrowedElement) {
+
+        borrowedElement.textContent =
+            borrowed;
+
+    }
+
+}
+
+
+// ========================================
 // 新增設備
-// =========================
+// ========================================
 
 async function addEquipment(event) {
 
-    // 阻止 HTML Form 預設的重新整理行為
+    // 防止表單重新整理
     event.preventDefault();
 
 
-    // 取得使用者輸入的資料
-    const name = document.getElementById("name").value;
+    // 確認是否為管理員
+    if (role !== "admin") {
+
+        alert(
+            "只有管理員可以新增設備"
+        );
+
+        return;
+    }
+
+
+    // 取得表單資料
+    const name =
+        document.getElementById(
+            "name"
+        ).value.trim();
+
 
     const category =
-        document.getElementById("category").value;
+        document.getElementById(
+            "category"
+        ).value.trim();
+
 
     const status =
-        document.getElementById("status").value;
+        document.getElementById(
+            "status"
+        ).value;
+
 
     const description =
-        document.getElementById("description").value;
+        document.getElementById(
+            "description"
+        ).value.trim();
 
 
-    // 建立要送給後端的資料
+    // 建立設備資料
     const equipmentData = {
 
         name: name,
@@ -139,111 +497,194 @@ async function addEquipment(event) {
 
     try {
 
-        // 向後端發送 POST Request
-        const response = await fetch(API_URL, {
+        // 發送 POST Request
+        const response =
+            await fetch(
+                API_URL,
+                {
 
-            // 指定 HTTP Method
-            method: "POST",
+                    method: "POST",
 
-            // 告訴後端我們傳送的是 JSON
-            headers: {
-                "Content-Type": "application/json"
-            },
+                    headers:
+                        getAuthHeaders(),
 
-            // 將 JavaScript Object 轉成 JSON 字串
-            body: JSON.stringify(equipmentData)
+                    body:
+                        JSON.stringify(
+                            equipmentData
+                        )
 
-        });
-
-
-        // 取得後端回傳的 JSON
-        const result = await response.json();
+                }
+            );
 
 
-        // 如果 HTTP Status 不是 2xx
+        // 取得後端回傳資料
+        const result =
+            await response.json();
+
+
+        // 如果 Token 無效
+        if (response.status === 401) {
+
+            logout();
+
+            return;
+        }
+
+
+        // 如果沒有管理員權限
+        if (response.status === 403) {
+
+            alert(
+                "你沒有權限新增設備"
+            );
+
+            return;
+        }
+
+
+        // 如果新增失敗
         if (!response.ok) {
 
-            // 顯示後端傳回的錯誤
-            alert(result.message);
+            alert(
+                result.message ||
+                "設備新增失敗"
+            );
 
             return;
         }
 
 
         // 新增成功
-        alert("設備新增成功！");
+        alert(
+            "設備新增成功！"
+        );
 
 
         // 清空表單
-        document.getElementById("equipmentForm").reset();
+        document
+            .getElementById(
+                "equipmentForm"
+            )
+            .reset();
 
 
-        // 重新取得設備列表
+        // 重新取得設備
         await loadEquipment();
 
 
     } catch (error) {
 
-        // 如果無法連接後端
-        console.error("新增設備失敗：", error);
+        console.error(
+            "新增設備失敗：",
+            error
+        );
 
-        alert("無法連接後端伺服器");
+        alert(
+            "無法連接後端伺服器"
+        );
 
     }
 
 }
-// =========================
+
+
+// ========================================
 // 刪除設備
-// =========================
+// ========================================
 
 async function deleteEquipment(id) {
 
-    // 先詢問使用者是否確定要刪除
-    const confirmed = confirm(
-        "確定要刪除這台設備嗎？"
-    );
+    // 確認是否為管理員
+    if (role !== "admin") {
 
-    // 使用者按取消
-    if (!confirmed) {
+        alert(
+            "只有管理員可以刪除設備"
+        );
+
         return;
+    }
+
+
+    // 詢問是否確定刪除
+    const confirmed =
+        confirm(
+            "確定要刪除這台設備嗎？"
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
     }
 
 
     try {
 
         // 發送 DELETE Request
-        const response = await fetch(
-            `${API_URL}/${id}`,
-            {
-                method: "DELETE"
-            }
-        );
+        const response =
+            await fetch(
+                `${API_URL}/${id}`,
+                {
+
+                    method: "DELETE",
+
+                    headers:
+                        getAuthHeaders()
+
+                }
+            );
 
 
-        // 取得後端回傳資料
-        const result = await response.json();
+        // 取得回傳資料
+        const result =
+            await response.json();
 
 
-        // 如果刪除失敗
-        if (!response.ok) {
+        // Token 失效
+        if (response.status === 401) {
 
-            alert(result.message);
+            logout();
 
             return;
         }
 
 
-        // 顯示成功訊息
-        alert("設備刪除成功！");
+        // 沒有權限
+        if (response.status === 403) {
+
+            alert(
+                "你沒有權限刪除設備"
+            );
+
+            return;
+        }
 
 
-        // 重新取得設備列表
+        // 刪除失敗
+        if (!response.ok) {
+
+            alert(
+                result.message ||
+                "設備刪除失敗"
+            );
+
+            return;
+        }
+
+
+        // 刪除成功
+        alert(
+            "設備刪除成功！"
+        );
+
+
+        // 重新取得設備
         await loadEquipment();
 
 
     } catch (error) {
 
-        // 顯示錯誤
         console.error(
             "刪除設備失敗：",
             error
@@ -252,69 +693,101 @@ async function deleteEquipment(id) {
         alert(
             "無法連接後端伺服器"
         );
+
     }
+
 }
-// =========================
+
+
+// ========================================
 // 開啟修改設備表單
-// =========================
+// ========================================
 
 async function editEquipment(id) {
 
-    try {
+    // 確認是否為管理員
+    if (role !== "admin") {
 
-        // 取得指定設備目前的資料
-        const response = await fetch(
-            `${API_URL}/${id}`
+        alert(
+            "只有管理員可以修改設備"
         );
 
-        // 將 JSON 轉成 JavaScript Object
-        const equipment = await response.json();
+        return;
+    }
 
 
-        // 如果找不到設備
+    try {
+
+        // 取得指定設備
+        const response =
+            await fetch(
+                `${API_URL}/${id}`
+            );
+
+
+        // 取得設備資料
+        const equipment =
+            await response.json();
+
+
+        // 如果取得失敗
         if (!response.ok) {
 
-            alert(equipment.message);
+            alert(
+                equipment.message ||
+                "取得設備失敗"
+            );
 
             return;
         }
 
 
-        // 將設備 ID 放進隱藏欄位
-        document.getElementById("editId").value =
+        // 將資料放入修改表單
+        document.getElementById(
+            "editId"
+        ).value =
             equipment.id;
 
 
-        // 將設備名稱放入表單
-        document.getElementById("editName").value =
+        document.getElementById(
+            "editName"
+        ).value =
             equipment.name;
 
 
-        // 將設備分類放入表單
-        document.getElementById("editCategory").value =
+        document.getElementById(
+            "editCategory"
+        ).value =
             equipment.category;
 
 
-        // 將設備狀態放入表單
-        document.getElementById("editStatus").value =
+        document.getElementById(
+            "editStatus"
+        ).value =
             equipment.status;
 
 
-        // 將設備描述放入表單
-        document.getElementById("editDescription").value =
+        document.getElementById(
+            "editDescription"
+        ).value =
             equipment.description || "";
 
 
-        // 顯示修改表單
-        document.getElementById("editSection").style.display =
+        // 顯示修改區域
+        document.getElementById(
+            "editSection"
+        ).style.display =
             "block";
 
 
-        // 將畫面捲到修改表單的位置
-        document.getElementById("editSection")
-            .scrollIntoView({
-                behavior: "smooth"
-            });
+        // 捲動到修改區域
+        document.getElementById(
+            "editSection"
+        ).scrollIntoView({
+
+            behavior: "smooth"
+
+        });
 
 
     } catch (error) {
@@ -327,47 +800,62 @@ async function editEquipment(id) {
         alert(
             "無法取得設備資料"
         );
+
     }
+
 }
-// =========================
-// 儲存修改後的設備
-// =========================
+
+
+// ========================================
+// 儲存設備修改
+// ========================================
 
 async function saveEquipment(event) {
 
-    // 阻止表單預設重新整理
+    // 防止表單重新整理
     event.preventDefault();
 
 
-    // 取得正在修改的設備 ID
+    // 確認是否為管理員
+    if (role !== "admin") {
+
+        alert(
+            "只有管理員可以修改設備"
+        );
+
+        return;
+    }
+
+
+    // 取得設備 ID
     const id =
-        document.getElementById("editId").value;
+        document.getElementById(
+            "editId"
+        ).value;
 
 
-    // 取得表單資料
-    const name =
-        document.getElementById("editName").value;
-
-    const category =
-        document.getElementById("editCategory").value;
-
-    const status =
-        document.getElementById("editStatus").value;
-
-    const description =
-        document.getElementById("editDescription").value;
-
-
-    // 建立要送給後端的資料
+    // 取得修改後資料
     const equipmentData = {
 
-        name: name,
+        name:
+            document.getElementById(
+                "editName"
+            ).value.trim(),
 
-        category: category,
+        category:
+            document.getElementById(
+                "editCategory"
+            ).value.trim(),
 
-        status: status,
+        status:
+            document.getElementById(
+                "editStatus"
+            ).value,
 
-        description: description
+        description:
+            document.getElementById(
+                "editDescription"
+            ).value.trim()
 
     };
 
@@ -375,54 +863,84 @@ async function saveEquipment(event) {
     try {
 
         // 發送 PUT Request
-        const response = await fetch(
-            `${API_URL}/${id}`,
-            {
+        const response =
+            await fetch(
+                `${API_URL}/${id}`,
+                {
 
-                method: "PUT",
+                    method: "PUT",
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                    headers:
+                        getAuthHeaders(),
 
-                body: JSON.stringify(
-                    equipmentData
-                )
+                    body:
+                        JSON.stringify(
+                            equipmentData
+                        )
 
-            }
-        );
+                }
+            );
 
 
-        // 取得後端回傳資料
+        // 取得回傳資料
         const result =
             await response.json();
 
 
-        // 如果修改失敗
-        if (!response.ok) {
+        // Token 失效
+        if (response.status === 401) {
 
-            alert(result.message);
+            logout();
 
             return;
         }
 
 
-        // 顯示成功訊息
-        alert("設備修改成功！");
+        // 沒有權限
+        if (response.status === 403) {
+
+            alert(
+                "你沒有權限修改設備"
+            );
+
+            return;
+        }
 
 
-        // 清空修改表單
+        // 修改失敗
+        if (!response.ok) {
+
+            alert(
+                result.message ||
+                "設備修改失敗"
+            );
+
+            return;
+        }
+
+
+        // 修改成功
+        alert(
+            "設備修改成功！"
+        );
+
+
+        // 清空表單
         document
-            .getElementById("editEquipmentForm")
+            .getElementById(
+                "editEquipmentForm"
+            )
             .reset();
 
 
-        // 隱藏修改表單
-        document.getElementById("editSection")
-            .style.display = "none";
+        // 隱藏修改區域
+        document.getElementById(
+            "editSection"
+        ).style.display =
+            "none";
 
 
-        // 重新取得設備列表
+        // 重新載入設備
         await loadEquipment();
 
 
@@ -436,60 +954,191 @@ async function saveEquipment(event) {
         alert(
             "無法連接後端伺服器"
         );
+
     }
+
 }
-// =========================
+
+
+// ========================================
 // 取消修改
-// =========================
+// ========================================
 
 function cancelEdit() {
 
-    // 清空修改表單
+    // 清空表單
     document
-        .getElementById("editEquipmentForm")
+        .getElementById(
+            "editEquipmentForm"
+        )
         .reset();
 
 
-    // 隱藏修改表單
-    document.getElementById("editSection")
-        .style.display = "none";
+    // 隱藏修改區域
+    document.getElementById(
+        "editSection"
+    ).style.display =
+        "none";
+
 }
 
-// =========================
-// 表單事件
-// =========================
 
-// 找到修改設備表單
+// ========================================
+// 登出
+// ========================================
+
+function logout() {
+
+    // 清除登入資訊
+    localStorage.removeItem("token");
+
+    localStorage.removeItem("username");
+
+    localStorage.removeItem("name");
+
+    localStorage.removeItem("role");
+
+
+    // 導向登入頁面
+    window.location.href =
+        "./login.html";
+
+}
+
+
+// ========================================
+// 借用設備
+// ========================================
+
+async function borrowEquipment(id) {
+
+    try {
+
+        // 發送借用 Request
+        const response =
+            await fetch(
+                `${BASE_URL}/borrow/${id}`,
+                {
+
+                    method: "POST",
+
+                    headers:
+                        getAuthHeaders()
+
+                }
+            );
+
+
+        // 取得後端回傳資料
+        const result =
+            await response.json();
+
+
+        // Token 失效
+        if (response.status === 401) {
+
+            logout();
+
+            return;
+        }
+
+
+        // 借用失敗
+        if (!response.ok) {
+
+            alert(
+                result.message ||
+                "設備借用失敗"
+            );
+
+            return;
+        }
+
+
+        // 借用成功
+        alert(
+            "設備借用成功！"
+        );
+
+
+        // 重新取得設備列表
+        await loadEquipment();
+
+
+    } catch (error) {
+
+        console.error(
+            "借用設備失敗：",
+            error
+        );
+
+        alert(
+            "無法連接後端伺服器"
+        );
+
+    }
+
+}
+
+
+// ========================================
+// 表單事件
+// ========================================
+
+// 新增設備表單
+const equipmentForm =
+    document.getElementById(
+        "equipmentForm"
+    );
+
+
+if (equipmentForm) {
+
+    equipmentForm.addEventListener(
+        "submit",
+        addEquipment
+    );
+
+}
+
+
+// 修改設備表單
 const editEquipmentForm =
     document.getElementById(
         "editEquipmentForm"
     );
 
 
-// 當使用者按下「儲存修改」
-editEquipmentForm.addEventListener(
-    "submit",
-    saveEquipment
-);
+if (editEquipmentForm) {
+
+    editEquipmentForm.addEventListener(
+        "submit",
+        saveEquipment
+    );
+
+}
 
 
-// 找到取消按鈕
+// 取消修改按鈕
 const cancelEditButton =
     document.getElementById(
         "cancelEditButton"
     );
 
 
-// 當使用者按下「取消」
-cancelEditButton.addEventListener(
-    "click",
-    cancelEdit
-);
+if (cancelEditButton) {
+
+    cancelEditButton.addEventListener(
+        "click",
+        cancelEdit
+    );
+
+}
 
 
-// =========================
+// ========================================
 // 網頁載入時執行
-// =========================
+// ========================================
 
-// 載入設備列表
+// 取得設備列表
 loadEquipment();
