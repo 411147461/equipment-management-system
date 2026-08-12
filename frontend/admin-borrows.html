@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <!-- 讓手機、平板也能正常顯示 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>所有借用紀錄 - 設備管理系統</title>
+
+    <!-- 載入原本的 CSS -->
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         導覽列
+         ========================= -->
+
+    <header class="navbar">
+
+        <div class="navbar-brand">
+
+            <div class="navbar-logo">
+                EMS
+            </div>
+
+            <span>
+                設備管理系統
+            </span>
+
+        </div>
+
+
+        <!-- 管理員資訊 -->
+
+        <div class="navbar-user">
+
+            <span id="userName">
+                管理員
+            </span>
+
+            <span
+                class="role-badge"
+                id="userRole"
+            >
+                admin
+            </span>
+
+
+            <!-- 返回設備列表 -->
+
+            <button
+                class="logout-button"
+                id="backButton"
+            >
+                返回設備
+            </button>
+
+
+            <!-- 登出 -->
+
+            <button
+                class="logout-button"
+                id="logoutButton"
+            >
+                登出
+            </button>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =========================
+         主要內容
+         ========================= -->
+
+    <main class="dashboard">
+
+
+        <!-- =========================
+             頁面標題
+             ========================= -->
+
+        <section class="welcome-section">
+
+            <div>
+
+                <p class="welcome-label">
+                    Equipment Management System
+                </p>
+
+                <h1>
+                    所有借用紀錄
+                </h1>
+
+                <p>
+                    查看系統中所有使用者的設備借用狀況。
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =========================
+             借用紀錄
+             ========================= -->
+
+        <section class="equipment-section">
+
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        借用紀錄
+                    </h2>
+
+                    <p>
+                        管理員可以查看所有設備借用紀錄
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- JavaScript 會將紀錄放在這裡 -->
+
+            <div
+                id="borrowList"
+                class="equipment-grid"
+            >
+
+                <div class="loading">
+                    載入借用紀錄中...
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- 載入 JavaScript -->
+
+    <script src="js/admin-borrows.js"></script>
+
+
+</body>
+
+</html>

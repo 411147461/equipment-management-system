@@ -35,15 +35,16 @@
 
         </div>
 
-
-        <!-- 使用者資訊 -->
-
+        <!-- 使用者資訊與功能按鈕 -->
         <div class="navbar-user">
 
+            <!-- 顯示目前登入者姓名 -->
             <span id="userName">
                 使用者
             </span>
 
+
+            <!-- 顯示使用者角色 -->
             <span
                 id="userRole"
                 class="role-badge"
@@ -51,6 +52,18 @@
                 user
             </span>
 
+
+            <!-- 前往我的借用紀錄 -->
+            <button
+                id="myBorrowButton"
+                class="my-borrow-button"
+                onclick="goToMyBorrows()"
+            >
+                我的借用紀錄
+            </button>
+
+
+            <!-- 登出 -->
             <button
                 id="logoutButton"
                 class="logout-button"

@@ -2,11 +2,17 @@
 // API 設定
 // ========================================
 
-// 後端設備 API 網址
-const API_URL = "http://localhost:3000/equipment";
+// Backend API 的根網址
+const BASE_URL =
+    "http://localhost:3000";
 
-// 後端 API 基礎網址
-const BASE_URL = "http://localhost:3000";
+// 設備 API
+const API_URL =
+    `${BASE_URL}/equipment`;
+
+// 借用 API
+const BORROW_API_URL =
+    `${BASE_URL}/borrow`;
 
 
 // ========================================
@@ -133,7 +139,18 @@ if (logoutButton) {
     );
 
 }
+// ========================================
+// 前往我的借用紀錄
+// ========================================
 
+// 使用者按下「我的借用紀錄」後
+// 前往 my-borrows.html
+function goToMyBorrows() {
+
+    window.location.href =
+        "./my-borrows.html";
+
+}
 
 // ========================================
 // 建立 JWT Request Headers
@@ -235,130 +252,145 @@ async function loadEquipment() {
             const isAvailable =
                 equipment.status === "available";
 
+            // ========================================
+            // 建立設備操作按鈕
+            // ========================================
 
-            // 建立設備卡片 HTML
+            let actionButtons = "";
+
+
+            // ========================================
+            // 設備可以借用
+            // ========================================
+
+            if (isAvailable) {
+
+                actionButtons += `
+
+                    <button
+                        class="borrow-button"
+                        onclick="borrowEquipment(${equipment.id})"
+                    >
+                        借用設備
+                    </button>
+
+                `;
+
+            }
+
+
+            // ========================================
+            // 設備已經借出
+            // ========================================
+
+            else {
+
+                actionButtons += `
+
+                    <button
+                        class="borrow-button disabled"
+                        disabled
+                    >
+                        借出中
+                    </button>
+
+                `;
+
+            }
+
+
+            // ========================================
+            // Admin 專屬功能
+            // ========================================
+
+            if (role === "admin") {
+
+                actionButtons += `
+
+                    <button
+                        class="edit-button"
+                        onclick="editEquipment(${equipment.id})"
+                    >
+                        修改
+                    </button>
+
+                    <button
+                        class="delete-button"
+                        onclick="deleteEquipment(${equipment.id})"
+                    >
+                        刪除
+                    </button>
+
+                `;
+
+            }
             card.innerHTML = `
 
-                <h3>
-                    ${equipment.name}
-                </h3>
+            <h3>${equipment.name}</h3>
 
+            <p>
+                <strong>分類：</strong>
+                ${equipment.category}
+            </p>
 
-                <p>
-                    <strong>分類：</strong>
-                    ${equipment.category}
-                </p>
+            <p>
+                <strong>狀態：</strong>
 
-
-                <p>
-
-                    <strong>狀態：</strong>
-
-                    <span class="status ${equipment.status}">
-
-                        ${
-                            isAvailable
-                                ? "可借用"
-                                : "借出中"
-                        }
-
-                    </span>
-
-                </p>
-
-
-                <p>
-                    <strong>描述：</strong>
-                    ${equipment.description || "無"}
-                </p>
-
-
-                <div class="equipment-actions">
-
+                <span class="status ${equipment.status}">
                     ${
-                        role === "admin"
-
-                            ? `
-
-                                <button
-                                    class="edit-button"
-                                    onclick="editEquipment(${equipment.id})"
-                                >
-                                    修改
-                                </button>
-
-                                <button
-                                    class="delete-button"
-                                    onclick="deleteEquipment(${equipment.id})"
-                                >
-                                    刪除
-                                </button>
-
-                              `
-
-                            : `
-
-                                ${
-                                    isAvailable
-
-                                        ? `
-
-                                            <button
-                                                class="borrow-button"
-                                                onclick="borrowEquipment(${equipment.id})"
-                                            >
-                                                借用設備
-                                            </button>
-
-                                          `
-
-                                        : `
-
-                                            <button
-                                                class="borrow-button disabled"
-                                                disabled
-                                            >
-                                                借出中
-                                            </button>
-
-                                          `
-                                }
-
-                              `
+                        equipment.status === "available"
+                            ? "可借用"
+                            : "借出中"
                     }
+                </span>
+            </p>
 
-                </div>
-
-            `;
-
-
-            // 將設備卡片加入列表
-            container.appendChild(card);
-
-        });
+            <p>
+                <strong>描述：</strong>
+                ${equipment.description || "無"}
+            </p>
 
 
-    } catch (error) {
+            <!-- ================================ -->
+            <!-- 設備操作按鈕 -->
+            <!-- ================================ -->
 
-        // 顯示錯誤
-        console.error(
-            "載入設備失敗：",
-            error
-        );
+            <div class="equipment-actions">
 
-
-        // 顯示錯誤訊息
-        document.getElementById(
-            "equipmentList"
-        ).innerHTML = `
-
-            <div class="loading">
-
-                無法載入設備資料
+                ${actionButtons}
 
             </div>
 
         `;
+
+
+                    // 將設備卡片加入列表
+                    container.appendChild(card);
+
+                });
+
+
+            } catch (error) {
+
+                // 顯示錯誤
+                console.error(
+                    "載入設備失敗：",
+                    error
+                );
+
+
+                // 顯示錯誤訊息
+                document.getElementById(
+                    "equipmentList"
+                ).innerHTML = `
+
+                    <div class="loading">
+
+                        無法載入設備資料
+
+                    </div>
+
+                `;
 
     }
 
@@ -1010,18 +1042,47 @@ function logout() {
 // 借用設備
 // ========================================
 
+// 使用者按下「借用設備」後執行
+//
+// API：
+// POST /borrow/:equipmentId
+//
+// 需要登入 JWT
 async function borrowEquipment(id) {
+
+    // ========================================
+    // 確認使用者是否真的要借用
+    // ========================================
+
+    const confirmed =
+        confirm(
+            "確定要借用這台設備嗎？"
+        );
+
+
+    // 使用者取消
+    if (!confirmed) {
+
+        return;
+
+    }
+
 
     try {
 
+        // ========================================
         // 發送借用 Request
+        // ========================================
+
         const response =
             await fetch(
-                `${BASE_URL}/borrow/${id}`,
+                `${BORROW_API_URL}/${id}`,
                 {
 
+                    // 建立借用紀錄
                     method: "POST",
 
+                    // 傳送 JWT
                     headers:
                         getAuthHeaders()
 
@@ -1029,21 +1090,35 @@ async function borrowEquipment(id) {
             );
 
 
-        // 取得後端回傳資料
+        // ========================================
+        // 取得 Backend 回傳資料
+        // ========================================
+
         const result =
             await response.json();
 
 
-        // Token 失效
+        // ========================================
+        // Token 無效
+        // ========================================
+
         if (response.status === 401) {
+
+            alert(
+                "登入已過期，請重新登入"
+            );
 
             logout();
 
             return;
+
         }
 
 
+        // ========================================
         // 借用失敗
+        // ========================================
+
         if (!response.ok) {
 
             alert(
@@ -1052,25 +1127,42 @@ async function borrowEquipment(id) {
             );
 
             return;
+
         }
 
 
+        // ========================================
         // 借用成功
+        // ========================================
+
         alert(
             "設備借用成功！"
         );
 
 
-        // 重新取得設備列表
+        // ========================================
+        // 重新載入設備列表
+        // ========================================
+
+        // Backend 已經將設備狀態改成 borrowed
+        //
+        // 所以重新載入後，
+        // 畫面會顯示「借出中」
+
         await loadEquipment();
 
 
     } catch (error) {
 
+        // ========================================
+        // 網路錯誤
+        // ========================================
+
         console.error(
             "借用設備失敗：",
             error
         );
+
 
         alert(
             "無法連接後端伺服器"
@@ -1079,7 +1171,6 @@ async function borrowEquipment(id) {
     }
 
 }
-
 
 // ========================================
 // 表單事件
