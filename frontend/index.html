@@ -36,42 +36,48 @@
         </div>
 
         <!-- 使用者資訊與功能按鈕 -->
-        <div class="navbar-user">
+       <div class="navbar-user">
 
-            <!-- 顯示目前登入者姓名 -->
-            <span id="userName">
-                使用者
-            </span>
+    <span id="userName">
+        使用者
+    </span>
 
+    <span
+        id="userRole"
+        class="role-badge"
+    >
+        user
+    </span>
 
-            <!-- 顯示使用者角色 -->
-            <span
-                id="userRole"
-                class="role-badge"
-            >
-                user
-            </span>
+    <!-- Admin：所有借用紀錄 -->
 
+    <button
+        id="adminBorrowButton"
+        class="nav-button admin-only"
+        style="display: none;"
+        onclick="window.location.href='admin-borrows.html'"
+    >
+         所有借用紀錄
+    </button>
 
-            <!-- 前往我的借用紀錄 -->
-            <button
-                id="myBorrowButton"
-                class="my-borrow-button"
-                onclick="goToMyBorrows()"
-            >
-                我的借用紀錄
-            </button>
+    <!-- 我的借用紀錄 -->
 
+    <button
+        id="myBorrowButton"
+        class="nav-button"
+        onclick="window.location.href='my-borrows.html'"
+    >
+        我的借用紀錄
+    </button>
 
-            <!-- 登出 -->
-            <button
-                id="logoutButton"
-                class="logout-button"
-            >
-                登出
-            </button>
+    <button
+        id="logoutButton"
+        class="logout-button"
+    >
+        登出
+    </button>
 
-        </div>
+</div>
 
     </header>
 

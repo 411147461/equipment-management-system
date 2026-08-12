@@ -1386,3 +1386,21 @@ body {
     border-color: rgba(255, 255, 255, 0.5);
 
 }
+/* =========================
+   導覽列按鈕
+   ========================= */
+
+.nav-button {
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    background-color: #2563eb;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.nav-button:hover {
+    opacity: 0.9;
+}

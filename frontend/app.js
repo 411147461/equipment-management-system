@@ -305,6 +305,15 @@ async function loadEquipment() {
 
             if (role === "admin") {
 
+                const adminBorrowButton =
+                    document.getElementById("adminBorrowButton");
+
+                if (role === "admin") {
+
+                    adminBorrowButton.style.display = "inline-block";
+
+                }
+
                 actionButtons += `
 
                     <button
