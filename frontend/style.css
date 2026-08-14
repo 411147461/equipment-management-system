@@ -1478,3 +1478,203 @@ body {
     }
 
 }
+/* =========================
+   最近借用紀錄
+   ========================= */
+
+.borrow-section {
+    margin-top: 30px;
+}
+
+
+.recent-borrow-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+
+.recent-borrow-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 18px 20px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 12px;
+
+    transition: transform 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+
+.recent-borrow-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 6px 16px
+        rgba(0, 0, 0, 0.06);
+}
+
+
+.recent-borrow-main h3 {
+    margin: 0 0 6px 0;
+
+    font-size: 16px;
+}
+
+
+.recent-borrow-main p {
+    margin: 0;
+
+    font-size: 14px;
+
+    color: #6b7280;
+}
+
+
+.recent-borrow-info {
+    display: flex;
+
+    align-items: center;
+
+    gap: 16px;
+
+    font-size: 14px;
+
+    color: #6b7280;
+}
+
+
+.borrow-status {
+    padding: 5px 10px;
+
+    border-radius: 20px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+.borrow-status.borrowed {
+    background: #fee2e2;
+
+    color: #dc2626;
+}
+
+
+.borrow-status.returned {
+    background: #dcfce7;
+
+    color: #16a34a;
+}
+
+
+/* =========================
+   手機版
+   ========================= */
+
+@media (max-width: 768px) {
+
+    .recent-borrow-card {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 12px;
+    }
+
+
+    .recent-borrow-info {
+        flex-wrap: wrap;
+
+        gap: 10px;
+    }
+
+}
+/* =========================
+   Admin 借用紀錄篩選
+   ========================= */
+
+.borrow-filters {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+
+    margin-bottom: 24px;
+    padding: 20px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 12px;
+}
+
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+
+    min-width: 220px;
+}
+
+
+.filter-group label {
+    font-size: 14px;
+
+    font-weight: 600;
+
+    color: #374151;
+}
+
+
+.filter-group select {
+    height: 42px;
+
+    padding: 0 12px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    font-size: 14px;
+
+    cursor: pointer;
+}
+
+
+.filter-group select:focus {
+    outline: none;
+
+    border-color: #2563eb;
+}
+
+
+/* =========================
+   手機版
+   ========================= */
+
+@media (max-width: 768px) {
+
+    .borrow-filters {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+
+    .filter-group {
+        width: 100%;
+    }
+
+}

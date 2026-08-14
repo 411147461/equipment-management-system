@@ -1234,7 +1234,302 @@ async function borrowEquipment(id) {
     }
 
 }
+// =========================
+// 載入最近借用紀錄
+// =========================
 
+async function loadRecentBorrows() {
+
+    // 取得登入資訊
+    const token =
+        localStorage.getItem("token");
+
+    const role =
+        localStorage.getItem("role");
+
+
+    // 沒有登入
+    if (!token) {
+
+        return;
+
+    }
+
+
+    try {
+
+        // =========================
+        // 根據角色決定 API
+        // =========================
+
+        let apiUrl;
+
+
+        if (role === "admin") {
+
+            // Admin 查看所有借用紀錄
+            apiUrl = BORROW_API_URL;
+
+        } else {
+
+            // User 只能查看自己的紀錄
+            apiUrl =
+                `${BORROW_API_URL}/my`;
+
+        }
+
+
+        // =========================
+        // 呼叫 API
+        // =========================
+
+        const response =
+            await fetch(
+                apiUrl,
+                {
+
+                    headers: {
+
+                        Authorization:
+                            `Bearer ${token}`
+
+                    }
+
+                }
+            );
+
+
+        const records =
+            await response.json();
+
+
+        // API 錯誤
+        if (!response.ok) {
+
+            console.error(
+                "取得借用紀錄失敗：",
+                records
+            );
+
+            return;
+
+        }
+
+
+        // =========================
+        // 只顯示最近 5 筆
+        // =========================
+
+        const recentRecords =
+            records.slice(0, 5);
+
+
+        renderRecentBorrows(
+            recentRecords,
+            role
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "載入最近借用紀錄失敗：",
+            error
+        );
+
+
+        document.getElementById(
+            "recentBorrowList"
+        ).innerHTML = `
+            <div class="loading">
+                無法載入借用紀錄
+            </div>
+        `;
+
+    }
+
+}
+// =========================
+// 顯示最近借用紀錄
+// =========================
+
+function renderRecentBorrows(
+    records,
+    role
+) {
+
+    const container =
+        document.getElementById(
+            "recentBorrowList"
+        );
+
+
+    // 沒有紀錄
+    if (records.length === 0) {
+
+        container.innerHTML = `
+            <div class="loading">
+                目前沒有借用紀錄
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    // 建立借用紀錄
+    container.innerHTML =
+        records.map(record => {
+
+
+            // 借用狀態
+            const isBorrowed =
+                record.status === "borrowed";
+
+
+            // User 不需要顯示自己名字
+            const userInfo =
+                role === "admin"
+                    ? `
+                        <span>
+                            👤
+                            ${record.user_name || record.name || record.username}
+                        </span>
+                    `
+                    : "";
+
+
+            return `
+
+                <div class="recent-borrow-card">
+
+                    <div class="recent-borrow-main">
+
+                        <h3>
+                            ${record.equipment_name}
+                        </h3>
+
+                        <p>
+                            ${record.category || "未分類"}
+                        </p>
+
+                    </div>
+
+
+                    <div class="recent-borrow-info">
+
+                        ${userInfo}
+
+
+                        <span
+                            class="
+                                borrow-status
+                                ${record.status}
+                            "
+                        >
+                            ${
+                                isBorrowed
+                                    ? "借用中"
+                                    : "已歸還"
+                            }
+                        </span>
+
+
+                        <span>
+                            ${formatBorrowDate(
+                                record.borrowed_at
+                            )}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }).join("");
+
+}
+// =========================
+// 格式化借用日期
+// =========================
+
+function formatBorrowDate(dateString) {
+
+    if (!dateString) {
+
+        return "未知時間";
+
+    }
+
+
+    const date =
+        new Date(dateString);
+
+
+    return date.toLocaleString(
+        "zh-TW",
+        {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
+
+}
+// =========================
+// 查看全部借用紀錄
+// =========================
+
+function setupBorrowNavigation() {
+
+    const button =
+        document.getElementById(
+            "viewAllBorrowButton"
+        );
+
+
+    if (!button) {
+
+        return;
+
+    }
+
+
+    const role =
+        localStorage.getItem("role");
+
+
+    if (role === "admin") {
+
+        button.textContent =
+            "查看所有紀錄";
+
+        button.onclick = function () {
+
+            window.location.href =
+                "admin-borrows.html";
+
+        };
+
+    } else {
+
+        button.textContent =
+            "我的借用紀錄";
+
+        button.onclick = function () {
+
+            window.location.href =
+                "my-borrows.html";
+
+        };
+
+    }
+
+}
 // ========================================
 // 表單事件
 // ========================================
@@ -1296,3 +1591,5 @@ if (cancelEditButton) {
 
 // 取得設備列表
 loadEquipment();
+loadRecentBorrows();
+setupBorrowNavigation();
