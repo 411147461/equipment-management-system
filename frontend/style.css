@@ -1404,3 +1404,77 @@ body {
 .nav-button:hover {
     opacity: 0.9;
 }
+/* =========================
+   設備搜尋與篩選
+   ========================= */
+
+.equipment-filter {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 24px;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+}
+
+
+.search-box,
+.filter-box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+
+.search-box {
+    flex: 1;
+}
+
+
+.search-box label,
+.filter-box label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+
+.search-box input,
+.filter-box select {
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #ffffff;
+}
+
+
+.search-box input:focus,
+.filter-box select:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+
+.filter-box {
+    width: 180px;
+}
+
+
+/* =========================
+   手機版
+   ========================= */
+
+@media (max-width: 768px) {
+
+    .equipment-filter {
+        flex-direction: column;
+    }
+
+    .filter-box {
+        width: 100%;
+    }
+
+}

@@ -14,7 +14,12 @@ const API_URL =
 const BORROW_API_URL =
     `${BASE_URL}/borrow`;
 
+// =========================
+// 設備資料
+// =========================
 
+// 儲存從後端取得的所有設備
+let allEquipment = [];
 // ========================================
 // 登入狀態
 // ========================================
@@ -173,169 +178,132 @@ function getAuthHeaders() {
 }
 
 
-// ========================================
-// 取得設備列表
-// ========================================
 
-async function loadEquipment() {
+// =========================
+// 顯示設備列表
+// =========================
 
-    try {
+function renderEquipment(equipmentList) {
 
-        // 向後端取得設備資料
-        const response =
-            await fetch(API_URL);
+    const container =
+        document.getElementById("equipmentList");
 
-
-        // 如果 Token 過期
-        // Backend 可能會回傳 401
-        if (response.status === 401) {
-
-            logout();
-
-            return;
-        }
+    // 清空目前列表
+    container.innerHTML = "";
 
 
-        // 將 JSON 轉成 JavaScript 資料
-        const equipmentList =
-            await response.json();
+    // 沒有搜尋結果
+    if (equipmentList.length === 0) {
+
+        container.innerHTML = `
+            <div class="loading">
+                找不到符合條件的設備
+            </div>
+        `;
+
+        return;
+    }
 
 
-        // 找到設備列表區域
-        const container =
-            document.getElementById(
-                "equipmentList"
-            );
+    // 顯示設備
+    equipmentList.forEach(equipment => {
+
+        const card =
+            document.createElement("div");
+
+        card.className =
+            "equipment-card";
 
 
-        // 清空原本內容
-        container.innerHTML = "";
+        // =========================
+        // 設備狀態
+        // =========================
+
+        const isAvailable =
+            equipment.status === "available";
 
 
-        // ========================================
-        // 更新統計數字
-        // ========================================
+        // =========================
+        // 登入資訊
+        // =========================
 
-        updateStatistics(equipmentList);
+        const role =
+            localStorage.getItem("role");
 
 
-        // 如果沒有設備
-        if (equipmentList.length === 0) {
+        // =========================
+        // 操作按鈕
+        // =========================
 
-            container.innerHTML = `
-                <div class="loading">
-                    目前沒有設備資料
-                </div>
+        let actionButtons = "";
+
+
+        // 可借用
+        if (isAvailable) {
+
+            actionButtons += `
+
+                <button
+                    class="borrow-button"
+                    onclick="borrowEquipment(${equipment.id})"
+                >
+                    借用設備
+                </button>
+
             `;
 
-            return;
+        }
+
+        // 借出中
+        else {
+
+            actionButtons += `
+
+                <button
+                    class="borrow-button disabled"
+                    disabled
+                >
+                    借出中
+                </button>
+
+            `;
+
         }
 
 
-        // ========================================
+        // Admin 功能
+        if (role === "admin") {
+
+            actionButtons += `
+
+                <button
+                    class="edit-button"
+                    onclick="editEquipment(${equipment.id})"
+                >
+                    修改
+                </button>
+
+                <button
+                    class="delete-button"
+                    onclick="deleteEquipment(${equipment.id})"
+                >
+                    刪除
+                </button>
+
+            `;
+
+        }
+
+
+        // =========================
         // 建立設備卡片
-        // ========================================
+        // =========================
 
-        equipmentList.forEach(equipment => {
+        card.innerHTML = `
 
-            // 建立設備卡片
-            const card =
-                document.createElement("div");
-
-
-            // 設定 CSS class
-            card.className =
-                "equipment-card";
-
-
-            // 判斷設備狀態
-            const isAvailable =
-                equipment.status === "available";
-
-            // ========================================
-            // 建立設備操作按鈕
-            // ========================================
-
-            let actionButtons = "";
-
-
-            // ========================================
-            // 設備可以借用
-            // ========================================
-
-            if (isAvailable) {
-
-                actionButtons += `
-
-                    <button
-                        class="borrow-button"
-                        onclick="borrowEquipment(${equipment.id})"
-                    >
-                        借用設備
-                    </button>
-
-                `;
-
-            }
-
-
-            // ========================================
-            // 設備已經借出
-            // ========================================
-
-            else {
-
-                actionButtons += `
-
-                    <button
-                        class="borrow-button disabled"
-                        disabled
-                    >
-                        借出中
-                    </button>
-
-                `;
-
-            }
-
-
-            // ========================================
-            // Admin 專屬功能
-            // ========================================
-
-            if (role === "admin") {
-
-                const adminBorrowButton =
-                    document.getElementById("adminBorrowButton");
-
-                if (role === "admin") {
-
-                    adminBorrowButton.style.display = "inline-block";
-
-                }
-
-                actionButtons += `
-
-                    <button
-                        class="edit-button"
-                        onclick="editEquipment(${equipment.id})"
-                    >
-                        修改
-                    </button>
-
-                    <button
-                        class="delete-button"
-                        onclick="deleteEquipment(${equipment.id})"
-                    >
-                        刪除
-                    </button>
-
-                `;
-
-            }
-            card.innerHTML = `
-
-            <h3>${equipment.name}</h3>
+            <h3>
+                ${equipment.name}
+            </h3>
 
             <p>
                 <strong>分類：</strong>
@@ -347,11 +315,12 @@ async function loadEquipment() {
 
                 <span class="status ${equipment.status}">
                     ${
-                        equipment.status === "available"
+                        isAvailable
                             ? "可借用"
                             : "借出中"
                     }
                 </span>
+
             </p>
 
             <p>
@@ -359,10 +328,6 @@ async function loadEquipment() {
                 ${equipment.description || "無"}
             </p>
 
-
-            <!-- ================================ -->
-            <!-- 設備操作按鈕 -->
-            <!-- ================================ -->
 
             <div class="equipment-actions">
 
@@ -373,39 +338,128 @@ async function loadEquipment() {
         `;
 
 
-                    // 將設備卡片加入列表
-                    container.appendChild(card);
+        container.appendChild(card);
 
-                });
+    });
+
+}
+// =========================
+// 搜尋與篩選設備
+// =========================
+
+function filterEquipment() {
+
+    const keyword =
+        document
+            .getElementById("searchEquipment")
+            .value
+            .toLowerCase()
+            .trim();
 
 
-            } catch (error) {
-
-                // 顯示錯誤
-                console.error(
-                    "載入設備失敗：",
-                    error
-                );
+    const status =
+        document
+            .getElementById("filterStatus")
+            .value;
 
 
-                // 顯示錯誤訊息
-                document.getElementById(
-                    "equipmentList"
-                ).innerHTML = `
+    // 篩選設備
+    const filteredEquipment =
+        allEquipment.filter(equipment => {
 
-                    <div class="loading">
+            // 搜尋名稱
+            const name =
+                equipment.name
+                    .toLowerCase();
 
-                        無法載入設備資料
 
-                    </div>
+            // 搜尋分類
+            const category =
+                equipment.category
+                    .toLowerCase();
 
-                `;
+
+            // 關鍵字符合名稱或分類
+            const matchKeyword =
+                name.includes(keyword) ||
+                category.includes(keyword);
+
+
+            // 狀態符合
+            const matchStatus =
+                status === "all" ||
+                equipment.status === status;
+
+
+            return (
+                matchKeyword &&
+                matchStatus
+            );
+
+        });
+
+
+    // 重新顯示
+    renderEquipment(filteredEquipment);
+
+}
+
+// =========================
+// 搜尋與篩選事件
+// =========================
+
+document
+    .getElementById("searchEquipment")
+    .addEventListener(
+        "input",
+        filterEquipment
+    );
+
+
+document
+    .getElementById("filterStatus")
+    .addEventListener(
+        "change",
+        filterEquipment
+    );
+// ========================================
+// 取得設備列表
+// ========================================
+
+async function loadEquipment() {
+
+    try {
+
+        const response =
+            await fetch(API_URL);
+
+        const equipmentList =
+            await response.json();
+
+
+        // 儲存所有設備
+        allEquipment = equipmentList;
+
+
+        // 顯示設備
+        renderEquipment(allEquipment);
+
+
+    } catch (error) {
+
+        console.error(
+            "載入設備失敗：",
+            error
+        );
+
+        document.getElementById(
+            "equipmentList"
+        ).innerHTML =
+            "<p>無法載入設備資料</p>";
 
     }
 
 }
-
-
 // ========================================
 // 更新設備統計
 // ========================================

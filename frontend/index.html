@@ -218,7 +218,7 @@
 
             </div>
 
-
+           
             <form id="equipmentForm">
 
                 <div class="form-grid">
@@ -481,7 +481,54 @@
 
             </div>
 
+             <!-- =========================
+                設備搜尋與篩選
+                ========================= -->
 
+            <div class="equipment-filter">
+
+                <!-- 搜尋設備 -->
+                <div class="search-box">
+
+                    <label for="searchEquipment">
+                        搜尋設備
+                    </label>
+
+                    <input
+                        type="text"
+                        id="searchEquipment"
+                        placeholder="搜尋設備名稱或分類..."
+                    >
+
+                </div>
+
+
+                <!-- 設備狀態篩選 -->
+                <div class="filter-box">
+
+                    <label for="filterStatus">
+                        設備狀態
+                    </label>
+
+                    <select id="filterStatus">
+
+                        <option value="all">
+                            全部
+                        </option>
+
+                        <option value="available">
+                            可借用
+                        </option>
+
+                        <option value="borrowed">
+                            借出中
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
             <!-- JavaScript 會把設備卡片放進這裡 -->
 
             <div
